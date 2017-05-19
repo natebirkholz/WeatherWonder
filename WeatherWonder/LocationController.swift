@@ -9,6 +9,10 @@
 import Foundation
 import CoreLocation
 
+enum LocationError {
+    case failedLocation
+}
+
 class LocationController: NSObject, CLLocationManagerDelegate {
 
     var currentZipCode: String = "56001"
@@ -19,9 +23,14 @@ class LocationController: NSObject, CLLocationManagerDelegate {
         locationManager.delegate = self
         locationManager.distanceFilter = kCLDistanceFilterNone
         locationManager.desiredAccuracy = kCLLocationAccuracyBest
-        locationManager.startUpdatingLocation()
-        locationManager.requestWhenInUseAuthorization()
-
+        switch CLLocationManager.authorizationStatus() {
+        case .notDetermined:
+            locationManager.requestWhenInUseAuthorization()
+        case .authorizedWhenInUse:
+            locationManager.startUpdatingLocation()
+        default:
+            break
+        }
     }
 
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
@@ -37,5 +46,35 @@ class LocationController: NSObject, CLLocationManagerDelegate {
                 print("Problem with the data received from geocoder")
             }
         })
+    }
+
+    func updadeLocation(completionHandler: @escaping (LocationError?)->()) {
+        if let  thisLocation = locationManager.location {
+            CLGeocoder().reverseGeocodeLocation(thisLocation, completionHandler: {(places, error) -> Void in
+                if error != nil { return }
+
+                if let count = places?.count, count > 0 {
+                    if let pm = places?[0], let code = pm.postalCode {
+                        print(code) //prints zip code
+                        self.currentZipCode = code
+                        completionHandler(nil)
+                    }
+                } else {
+                    print("Problem with the data received from geocoder")
+                    completionHandler(.failedLocation)
+                }
+            })
+        }
+    }
+
+    func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
+        switch CLLocationManager.authorizationStatus() {
+        case .notDetermined:
+            locationManager.requestWhenInUseAuthorization()
+        case .authorizedWhenInUse:
+            locationManager.startUpdatingLocation()
+        default:
+            break
+        }
     }
 }
