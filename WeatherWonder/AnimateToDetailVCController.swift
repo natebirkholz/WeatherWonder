@@ -1,0 +1,52 @@
+//
+//  AnimateToDetailVCController.swift
+//  WeatherWonder
+//
+//  Created by Nathan Birkholz on 5/19/17.
+//  Copyright © 2017 natebirkholz. All rights reserved.
+//
+
+import UIKit
+
+class AnimateToDetailVCController : NSObject, UIViewControllerAnimatedTransitioning {
+
+  func transitionDuration(using transitionContext: UIViewControllerContextTransitioning?) -> TimeInterval {
+    return 1.0
+  }
+
+  func animateTransition(using transitionContext: UIViewControllerContextTransitioning) {
+    let fromViewController = transitionContext.viewController(forKey: UITransitionContextViewControllerKey.from) as! ViewController
+    let toViewController = transitionContext.viewController(forKey: UITransitionContextViewControllerKey.to) as! DetailViewController
+    let containerView = transitionContext.containerView
+    let duration = self.transitionDuration(using: transitionContext)
+    let selectedRow = fromViewController.tableView.indexPathForSelectedRow
+    let cell = fromViewController.tableView.cellForRow(at: selectedRow!) as! WeatherCell
+    let weatherSnapshot = cell.forecastImage.snapshotView(afterScreenUpdates: false)
+
+    weatherSnapshot?.frame = containerView.convert(cell.forecastImage.frame, from: fromViewController.tableView.cellForRow(at: selectedRow!))
+    cell.forecastImage.isHidden = true
+    toViewController.view.frame = transitionContext.finalFrame(for: toViewController)
+    toViewController.view.alpha = 0
+    toViewController.detailImageView.isHidden = true
+      // Update layout to clean up begnning positions of labels on detail VC, Size Classes issue
+    toViewController.view.setNeedsLayout()
+    toViewController.view.layoutIfNeeded()
+
+    containerView.addSubview(toViewController.view)
+    containerView.addSubview(weatherSnapshot!)
+    UIView.animate(withDuration: duration, animations: { () -> Void in
+        // Update layout to set proper target for final frame of animation, Size Classes issue
+      toViewController.view.setNeedsLayout()
+      toViewController.view.layoutIfNeeded()
+      
+      toViewController.view.alpha = 1.0
+      weatherSnapshot?.frame = toViewController.detailImageView.frame
+    }, completion: { (finished) -> Void in
+      toViewController.detailImageView.isHidden = false
+      cell.forecastImage.isHidden = false
+      weatherSnapshot?.removeFromSuperview()
+      transitionContext.completeTransition(true)
+    }) 
+  }
+
+} // End
