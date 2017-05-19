@@ -14,8 +14,12 @@ enum ParseError: Error {
 
 class JsonParser {
 
+    /// Parses JSON into an array of Forecast objects from the API JSON response
+    ///
+    /// - Parameter rawJSONData: the raw JSON data as Data
+    /// - Returns: returns an array of Forecast obects
+    /// - Throws: Throws a ParseError upon failure to parse
     func parseJSONIntoForecasts(_ rawJSONData: Data) throws -> [Forecast] {
-
         do {
             if let dictionaryFromJSON = try JSONSerialization.jsonObject(with: rawJSONData, options: JSONSerialization.ReadingOptions.allowFragments) as? [String: Any] {
                 var arrayOfForecasts = [Forecast]()
@@ -54,6 +58,10 @@ class JsonParser {
         }
     }
 
+    /// Takes a date code from the API JSON and converts it to a day of the week
+    ///
+    /// - Parameter dateCode: the date code from the api
+    /// - Returns: The day of the week as a string
     func parseDateCodeIntoDay(_ dateCode: Double) -> String {
         let formatter = DateFormatter()
         formatter.dateFormat = "EEEE"
@@ -62,6 +70,10 @@ class JsonParser {
         return dateForForecast
     }
 
+    /// Determines the forecast from a weather code from the API JSON
+    ///
+    /// - Parameter forecastIDCode: <#forecastIDCode description#>
+    /// - Returns: <#return value description#>
     func parseWeatherTypeIntoForecastType(_ forecastIDCode: Int) -> String {
         switch forecastIDCode {
         case 200...622, 771, 781, 900...902, 905, 906:

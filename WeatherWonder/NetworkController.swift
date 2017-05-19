@@ -18,17 +18,19 @@ enum NetworkControllerError {
 }
 
 class NetworkController {
+
+    /// Dynamically returns the url for the API call by addin the current zip code.
+    /// Only works in USA
     var apiURL: String {
         let location = locationController.currentZipCode
-        print("http://api.openweathermap.org/data/2.5/forecast/daily?zip=\(location),us&units=imperial&cnt=7&APPID=3e15652a662d33a186fdcf5567cf1f66")
         return "http://api.openweathermap.org/data/2.5/forecast/daily?zip=\(location),us&units=imperial&cnt=7&APPID=3e15652a662d33a186fdcf5567cf1f66"
     }
     let networkQueue = OperationQueue()
     let locationController = LocationController()
 
-    init() {
-    }
-
+    /// Fetches the JSON from the API using rhe apiURL property
+    ///
+    /// - Parameter completionHandler: returns an optional array of forecasts of successful, a optional NetworkControllerError error if unsuccessful
     func getJSONForForecasts(_ completionHandler : @escaping (_ forecasts: [Forecast]?, _ error: NetworkControllerError?) -> ()) {
         self.fetchJSONFromURL(self.apiURL, completionHandler: { (maybeDataFromURL, maybeError) -> () in
             guard let dataResult = maybeDataFromURL else {
@@ -37,7 +39,6 @@ class NetworkController {
                 } else {
                     completionHandler(nil, .unknownError)
                 }
-
                 return
             }
 
@@ -53,6 +54,11 @@ class NetworkController {
         })
     }
 
+    /// Creates the newtork call to the API to fetch the JSON as data
+    ///
+    /// - Parameters:
+    ///   - aURL: the url for the api call
+    ///   - completionHandler: returns optional data if successful, an optional NetworkControllerError if unsuccessful
     func fetchJSONFromURL(_ aURL: String, completionHandler : @escaping (_ dataFromURL: Data?, _ error: NetworkControllerError?) -> ()) {
         let fetchURL = URL(string: aURL)
         let fetchSession = URLSession.shared
@@ -70,14 +76,11 @@ class NetworkController {
                 case 200:
                     completionHandler(dataFromRequest, nil)
                 default:
-                    print("ERROR: Bad response")
                     completionHandler(dataFromRequest, .failedResponse)
                 }
             } else {
-                print("NO RESPONSE------")
                 completionHandler(nil, .noResponse)
             }
         }).resume()
     }
-    
-} // End
+}

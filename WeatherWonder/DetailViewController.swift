@@ -38,4 +38,4 @@ class DetailViewController: UIViewController, UINavigationControllerDelegate {
         super.didReceiveMemoryWarning()
     }
 
-} // End
+}

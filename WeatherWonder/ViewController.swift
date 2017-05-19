@@ -117,6 +117,8 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     }
 }
 
+// MARK: Error Handling
+
 extension ViewController {
     func handleError(error: NetworkControllerError) {
         switch error {

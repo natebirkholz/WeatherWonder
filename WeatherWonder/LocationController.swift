@@ -13,9 +13,11 @@ enum LocationError {
     case failedLocation
 }
 
+// TODO: - Add delegate to update the UITableView when locationManager didUpdateLocations is called?
+
 class LocationController: NSObject, CLLocationManagerDelegate {
 
-    var currentZipCode: String = "56001"
+    var currentZipCode: String = "92102"
     var locationManager = CLLocationManager()
 
     override init() {
@@ -34,11 +36,11 @@ class LocationController: NSObject, CLLocationManagerDelegate {
     }
 
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        CLGeocoder().reverseGeocodeLocation(locations[0], completionHandler: {(placemarks, error) -> Void in
+        CLGeocoder().reverseGeocodeLocation(locations[0], completionHandler: {(places, error) -> Void in
             if error != nil { return }
 
-            if placemarks!.count > 0 {
-                if let pm = placemarks?[0], let code = pm.postalCode {
+            if let count = places?.count, count > 0 {
+                if let pm = places?[0], let code = pm.postalCode {
                     print(code) //prints zip code
                     self.currentZipCode = code
                 }
@@ -51,7 +53,10 @@ class LocationController: NSObject, CLLocationManagerDelegate {
     func updadeLocation(completionHandler: @escaping (LocationError?)->()) {
         if let  thisLocation = locationManager.location {
             CLGeocoder().reverseGeocodeLocation(thisLocation, completionHandler: {(places, error) -> Void in
-                if error != nil { return }
+                if error != nil {
+                    completionHandler(.failedLocation)
+                    return
+                }
 
                 if let count = places?.count, count > 0 {
                     if let pm = places?[0], let code = pm.postalCode {
