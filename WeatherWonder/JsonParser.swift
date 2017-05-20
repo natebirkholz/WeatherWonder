@@ -36,9 +36,9 @@ class JsonParser {
                             let forecastHumidity = forecastDictionary["humidity"] as? Int,
                             let forecastMax = tempDictionary["max"] as? Int,
                             let forecastMin = tempDictionary["min"] as? Int {
-                                let id = self.parseWeatherTypeIntoForecastType(forecastIDCode)
+                                let forecastType = self.parseWeatherTypeIntoForecastType(forecastIDCode)
                                 let day = self.parseDateCodeIntoDay(forecastDateCode)
-                                let newForecast = Forecast(day: day, weatherID: id, humidity: forecastHumidity, maxTemp: forecastMax, minTemp: forecastMin)
+                                let newForecast = Forecast(day: day, forecastType: forecastType, humidity: forecastHumidity, maxTemp: forecastMax, minTemp: forecastMin)
                                 arrayOfForecasts.append(newForecast)
                         } else {
                             throw ParseError.unableToParse
@@ -72,18 +72,18 @@ class JsonParser {
 
     /// Determines the forecast from a weather code from the API JSON
     ///
-    /// - Parameter forecastIDCode: <#forecastIDCode description#>
-    /// - Returns: <#return value description#>
-    func parseWeatherTypeIntoForecastType(_ forecastIDCode: Int) -> String {
+    /// - Parameter forecastIDCode: 3 digit code from API denoting forecast
+    /// - Returns: ForecastType associated wth the forecast
+    func parseWeatherTypeIntoForecastType(_ forecastIDCode: Int) -> ForecastType {
         switch forecastIDCode {
         case 200...622, 771, 781, 900...902, 905, 906:
-            return "rainy"
+            return .rainy
         case 700...762, 802...804:
-            return "cloudy"
+            return .cloudy
         case 800...801:
-            return "sunny"
+            return .sunny
         default:
-            return "sunny"
+            return .sunny
         }
     }
     

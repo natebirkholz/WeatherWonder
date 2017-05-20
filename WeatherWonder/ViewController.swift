@@ -15,7 +15,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     @IBOutlet weak var tableView: UITableView!
 
     var forecasts : [Forecast]?
-    var networkController : NetworkController!
+    let networkController = NetworkController()
 
     // MARK: Lifecycle
 
@@ -25,7 +25,6 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         tableView.dataSource =  self
         tableView.delegate = self
         navigationController?.delegate = self
-        networkController = NetworkController()
         tableView.register((UINib(nibName: "WeatherCell", bundle: Bundle.main)), forCellReuseIdentifier: "FORECAST_CELL")
     }
 
@@ -36,7 +35,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
 
-        networkController.locationController.updadeLocation { _ in
+        networkController.locationController.updadeLocation {
             self.networkController.getJSONForForecasts({ (maybeForecasts, maybeError) in
                 guard maybeError == nil else {
                     self.handleError(error: maybeError!)
@@ -66,25 +65,40 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let forecastForRow = self.forecasts?[(indexPath as NSIndexPath).row] as Forecast!
+        let forecastForRow = self.forecasts?[(indexPath as NSIndexPath).row]
         let cell = self.tableView.dequeueReusableCell(withIdentifier: "FORECAST_CELL", for: indexPath) as! WeatherCell
         // Keep images consistent in tableView
         let currentTag = cell.tag + 1
         cell.tag = currentTag
-        cell.forecastImage.image = self.getImageForCell((forecastForRow?.forecastType)!)
-        cell.forecastLabel.text = forecastForRow?.forecastDay
+
+        if let forecastType = forecastForRow?.forecastType, let day = forecastForRow?.forecastDay {
+            cell.forecastImage.image = self.getImageForCell(withForecast: forecastType)
+            cell.forecastLabel.text = day
+
+            switch forecastType {
+            case .sunny:
+                cell.backgroundColor = UIColor.yellow.withAlphaComponent(0.35)
+            case .cloudy:
+                cell.backgroundColor = UIColor.blue.withAlphaComponent(0.35)
+            case .rainy:
+                cell.backgroundColor = UIColor.lightGray.withAlphaComponent(0.35)
+            }
+        } else {
+            cell.forecastImage.image = self.getImageForCell(withForecast: .sunny)
+            cell.forecastLabel.text = "Funday!"
+            cell.backgroundColor = UIColor.yellow.withAlphaComponent(0.35)
+        }
+
         return cell
     }
 
-    func getImageForCell(_ weatherString: String) -> UIImage {
-        switch weatherString {
-        case "rainy":
+    func getImageForCell(withForecast forecastType: ForecastType) -> UIImage {
+        switch forecastType {
+        case .rainy:
             return UIImage(named: "Rainy")!
-        case "cloudy":
+        case .cloudy:
             return UIImage(named: "Cloudy")!
-        case "sunny":
-            return UIImage(named: "Sunny")!
-        default:
+        case .sunny:
             return UIImage(named: "Sunny")!
         }
     }

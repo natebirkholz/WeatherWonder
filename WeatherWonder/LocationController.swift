@@ -9,12 +9,6 @@
 import Foundation
 import CoreLocation
 
-enum LocationError {
-    case failedLocation
-}
-
-// TODO: - Add delegate to update the UITableView when locationManager didUpdateLocations is called?
-
 class LocationController: NSObject, CLLocationManagerDelegate {
 
     var currentZipCode: String = "92102"
@@ -40,33 +34,37 @@ class LocationController: NSObject, CLLocationManagerDelegate {
             if error != nil { return }
 
             if let count = places?.count, count > 0 {
-                if let pm = places?[0], let code = pm.postalCode {
-                    print(code) //prints zip code
+                if let place = places?[0], let code = place.postalCode {
+                    print(code)
                     self.currentZipCode = code
                 }
             } else {
-                print("Problem with the data received from geocoder")
+                print("Problem with the data received from CLGeocoder")
             }
         })
     }
 
-    func updadeLocation(completionHandler: @escaping (LocationError?)->()) {
+    /// Updates the currentZipCode by explicit call instead of in locationManager: didUpdateLocations:
+    ///
+    /// - Parameter completionHandler: callback upon completion
+    func updadeLocation(completionHandler: @escaping ()->()) {
         if let  thisLocation = locationManager.location {
             CLGeocoder().reverseGeocodeLocation(thisLocation, completionHandler: {(places, error) -> Void in
                 if error != nil {
-                    completionHandler(.failedLocation)
+                    print(error?.localizedDescription as Any)
+                    completionHandler()
                     return
                 }
 
                 if let count = places?.count, count > 0 {
-                    if let pm = places?[0], let code = pm.postalCode {
-                        print(code) //prints zip code
+                    if let place = places?[0], let code = place.postalCode {
+                        print(code)
                         self.currentZipCode = code
-                        completionHandler(nil)
+                        completionHandler()
                     }
                 } else {
-                    print("Problem with the data received from geocoder")
-                    completionHandler(.failedLocation)
+                    print("Problem with the data received from CLGeocoder")
+                    completionHandler()
                 }
             })
         }

@@ -8,17 +8,23 @@
 
 import Foundation
 
+enum ForecastType: String {
+    case sunny = "sunny"
+    case cloudy = "cloudy"
+    case rainy = "rainy"
+}
+
 class Forecast {
 
   var forecastDay : String
-  var forecastType : String
+  var forecastType : ForecastType
   var forecastHumidity : Int
   var forecastMaxTemp : Int
   var forecastMinTemp : Int
 
-  init (day: String, weatherID: String, humidity: Int, maxTemp: Int, minTemp: Int) {
+  init (day: String, forecastType: ForecastType, humidity: Int, maxTemp: Int, minTemp: Int) {
     self.forecastDay = day
-    self.forecastType = weatherID
+    self.forecastType = forecastType
     self.forecastHumidity = Int(humidity)
     self.forecastMaxTemp = maxTemp
     self.forecastMinTemp = minTemp
