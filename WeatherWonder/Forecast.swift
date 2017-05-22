@@ -18,7 +18,7 @@ enum ForecastType: String, CustomStringConvertible {
     }
 }
 
-class Forecast {
+struct Forecast {
 
     var forecastDay: String
     var forecastType: ForecastType
@@ -29,7 +29,7 @@ class Forecast {
     init(day: String, typeOfForecast: ForecastType, humidity: Int, maxTemp: Int, minTemp: Int) {
         forecastDay = day
         forecastType = typeOfForecast
-        forecastHumidity = Int(humidity)
+        forecastHumidity = humidity
         forecastMaxTemp = maxTemp
         forecastMinTemp = minTemp
     }
