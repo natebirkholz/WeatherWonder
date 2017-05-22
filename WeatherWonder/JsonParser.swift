@@ -39,7 +39,6 @@ class JsonParser {
                             let forecastType = parseWeatherTypeIntoForecastType(forecastIDCode)
                             let day = parseDateCodeIntoDay(forecastDateCode)
                             let newForecast = Forecast(day: day, typeOfForecast: forecastType, humidity: forecastHumidity, maxTemp: forecastMax, minTemp: forecastMin)
-                            print(newForecast)
                             arrayOfForecasts.append(newForecast)
                         } else {
                             throw ParseError.unableToParse
