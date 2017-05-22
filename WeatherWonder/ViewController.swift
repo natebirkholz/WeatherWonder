@@ -154,6 +154,8 @@ extension ViewController {
             showError(message: "The server returned unrecognized data.")
         case .unknownError:
             showError(message: "An unknown error occurred.")
+        case .badURL:
+            showError(message: "The request to the server failed to begin.")
         }
     }
 

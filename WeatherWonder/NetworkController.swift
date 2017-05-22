@@ -10,6 +10,7 @@ import Foundation
 import CoreLocation
 
 enum NetworkControllerError {
+    case badURL
     case noData
     case noResponse
     case failedResponse
@@ -62,9 +63,13 @@ class NetworkController {
     ///   - aURL: the url for the api call
     ///   - completionHandler: returns optional data if successful, an optional NetworkControllerError if unsuccessful
     func fetchJSONFromURL(_ aURL: String, completionHandler: @escaping (_ dataFromURL: Data?, _ error: NetworkControllerError?) -> ()) {
-        let fetchURL = URL(string: aURL)
+        guard let fetchURL = URL(string: aURL) else {
+            assertionFailure("Failed to initialize URL from string \(aURL)")
+            completionHandler(nil, .badURL)
+            return
+        }
         let fetchSession = URLSession.shared
-        var request = URLRequest(url: fetchURL!)
+        var request = URLRequest(url: fetchURL)
         request.httpMethod = "GET"
 
         fetchSession.dataTask(with: request, completionHandler: { (maybeData, response, error) -> Void in
