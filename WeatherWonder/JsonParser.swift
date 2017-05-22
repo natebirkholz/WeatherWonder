@@ -26,7 +26,7 @@ class JsonParser {
 
                 if let arrayFromJSON = dictionaryFromJSON["list"] as? [Any] {
                     for JSONDictionary in arrayFromJSON {
-                        // long let block, if first two succeed this should all succeed
+                        // long `let` block, if first two succeed this should all succeed
                         if let forecastDictionary = JSONDictionary as? [String: Any],
                             let weatherArray = forecastDictionary["weather"] as? [Any],
                             let weatherDictionary = weatherArray.first as? [String: Any],
@@ -36,10 +36,11 @@ class JsonParser {
                             let forecastHumidity = forecastDictionary["humidity"] as? Int,
                             let forecastMax = tempDictionary["max"] as? Int,
                             let forecastMin = tempDictionary["min"] as? Int {
-                                let forecastType = self.parseWeatherTypeIntoForecastType(forecastIDCode)
-                                let day = self.parseDateCodeIntoDay(forecastDateCode)
-                                let newForecast = Forecast(day: day, forecastType: forecastType, humidity: forecastHumidity, maxTemp: forecastMax, minTemp: forecastMin)
-                                arrayOfForecasts.append(newForecast)
+                            let forecastType = parseWeatherTypeIntoForecastType(forecastIDCode)
+                            let day = parseDateCodeIntoDay(forecastDateCode)
+                            let newForecast = Forecast(day: day, typeOfForecast: forecastType, humidity: forecastHumidity, maxTemp: forecastMax, minTemp: forecastMin)
+                            print(newForecast)
+                            arrayOfForecasts.append(newForecast)
                         } else {
                             throw ParseError.unableToParse
                         }

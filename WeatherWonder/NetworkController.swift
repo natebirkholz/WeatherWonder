@@ -25,32 +25,34 @@ class NetworkController {
         let location = locationController.currentZipCode
         return "http://api.openweathermap.org/data/2.5/forecast/daily?zip=\(location),us&units=imperial&cnt=7&APPID=3e15652a662d33a186fdcf5567cf1f66"
     }
-    let networkQueue = OperationQueue()
+
+    /// Used to determine the device's current location for the API call
     let locationController = LocationController()
 
     /// Fetches the JSON from the API using rhe apiURL property
     ///
     /// - Parameter completionHandler: returns an optional array of forecasts of successful, a optional NetworkControllerError error if unsuccessful
-    func getJSONForForecasts(_ completionHandler : @escaping (_ forecasts: [Forecast]?, _ error: NetworkControllerError?) -> ()) {
-        self.fetchJSONFromURL(self.apiURL, completionHandler: { (maybeDataFromURL, maybeError) -> () in
-            guard let dataResult = maybeDataFromURL else {
-                if let error = maybeError {
-                    completionHandler(nil, error)
-                } else {
-                    completionHandler(nil, .unknownError)
+    func getJSONForForecasts(_ completionHandler: @escaping (_ forecasts: [Forecast]?, _ error: NetworkControllerError?) -> ()) {
+        fetchJSONFromURL(apiURL, completionHandler: { (maybeDataFromURL, maybeError) -> () in
+            DispatchQueue.main.async {
+                guard let dataResult = maybeDataFromURL else {
+                    if let error = maybeError {
+                        completionHandler(nil, error)
+                    } else {
+                        completionHandler(nil, .unknownError)
+                    }
+                    return
                 }
-                return
+
+                do {
+                    let parser = JsonParser()
+                    let forecasts = try parser.parseJSONIntoForecasts(dataResult)
+                    completionHandler(forecasts, nil)
+                } catch {
+                    completionHandler(nil, .parseError)
+                }
             }
 
-            do {
-                let parser = JsonParser()
-                let forecasts = try parser.parseJSONIntoForecasts(dataResult)
-                OperationQueue.main.addOperation({ () -> Void in
-                    completionHandler(forecasts, nil)
-                })
-            } catch {
-                completionHandler(nil, .parseError)
-            }
         })
     }
 
@@ -59,7 +61,7 @@ class NetworkController {
     /// - Parameters:
     ///   - aURL: the url for the api call
     ///   - completionHandler: returns optional data if successful, an optional NetworkControllerError if unsuccessful
-    func fetchJSONFromURL(_ aURL: String, completionHandler : @escaping (_ dataFromURL: Data?, _ error: NetworkControllerError?) -> ()) {
+    func fetchJSONFromURL(_ aURL: String, completionHandler: @escaping (_ dataFromURL: Data?, _ error: NetworkControllerError?) -> ()) {
         let fetchURL = URL(string: aURL)
         let fetchSession = URLSession.shared
         var request = URLRequest(url: fetchURL!)

@@ -12,6 +12,7 @@ import CoreLocation
 class LocationController: NSObject, CLLocationManagerDelegate {
 
     var currentZipCode: String = "92102"
+    /// Instance of a CLLocaationManager
     var locationManager = CLLocationManager()
 
     override init() {
@@ -35,7 +36,6 @@ class LocationController: NSObject, CLLocationManagerDelegate {
 
             if let count = places?.count, count > 0 {
                 if let place = places?[0], let code = place.postalCode {
-                    print(code)
                     self.currentZipCode = code
                 }
             } else {
@@ -58,7 +58,6 @@ class LocationController: NSObject, CLLocationManagerDelegate {
 
                 if let count = places?.count, count > 0 {
                     if let place = places?[0], let code = place.postalCode {
-                        print(code)
                         self.currentZipCode = code
                         completionHandler()
                     }

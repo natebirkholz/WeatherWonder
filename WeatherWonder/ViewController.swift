@@ -14,7 +14,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
 
     @IBOutlet weak var tableView: UITableView!
 
-    var forecasts : [Forecast]?
+    var forecasts: [Forecast]?
     let networkController = NetworkController()
 
     // MARK: Lifecycle
@@ -61,18 +61,19 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     }
 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return self.forecasts?.count ?? 0
+        return forecasts?.count ?? 0
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let forecastForRow = self.forecasts?[(indexPath as NSIndexPath).row]
-        let cell = self.tableView.dequeueReusableCell(withIdentifier: "FORECAST_CELL", for: indexPath) as! WeatherCell
+        let forecastForRow = forecasts?[(indexPath as NSIndexPath).row]
+        let cell = tableView.dequeueReusableCell(withIdentifier: "FORECAST_CELL", for: indexPath) as! WeatherCell
+
         // Keep images consistent in tableView
         let currentTag = cell.tag + 1
         cell.tag = currentTag
 
         if let forecastType = forecastForRow?.forecastType, let day = forecastForRow?.forecastDay {
-            cell.forecastImage.image = self.getImageForCell(withForecast: forecastType)
+            cell.forecastImage.image = getImageForCell(withForecast: forecastType)
             cell.forecastLabel.text = day
 
             switch forecastType {
@@ -84,7 +85,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
                 cell.backgroundColor = UIColor.lightGray.withAlphaComponent(0.35)
             }
         } else {
-            cell.forecastImage.image = self.getImageForCell(withForecast: .sunny)
+            cell.forecastImage.image = getImageForCell(withForecast: .sunny)
             cell.forecastLabel.text = "Funday!"
             cell.backgroundColor = UIColor.yellow.withAlphaComponent(0.35)
         }
@@ -106,19 +107,23 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     // MARK: Transition
 
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        self.performSegue(withIdentifier: "SHOW_DETAIL", sender: self)
+        performSegue(withIdentifier: "SHOW_DETAIL", sender: self)
     }
 
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "SHOW_DETAIL" {
+            guard let indexPathForForecast = tableView.indexPathForSelectedRow else { return }
             let detailVC = segue.destination as! DetailViewController
-            let indexPathForForecast = self.tableView.indexPathForSelectedRow as IndexPath!
-            let detailForecast = self.forecasts?[(indexPathForForecast?.row)!]
-            let cell = self.tableView.cellForRow(at: indexPathForForecast!) as! WeatherCell
+            let detailForecast = forecasts?[indexPathForForecast.row]
+            let cell = tableView.cellForRow(at: indexPathForForecast) as! WeatherCell
             let image = cell.forecastImage.image
             detailVC.forecastForDetail = detailForecast
             detailVC.forecastDetailImage = image
         }
+    }
+
+    override func performSegue(withIdentifier identifier: String, sender: Any?) {
+        super.performSegue(withIdentifier: identifier, sender: sender)
     }
 
     func navigationController(_ navigationController: UINavigationController, animationControllerFor operation: UINavigationControllerOperation, from fromVC: UIViewController, to toVC: UIViewController) -> UIViewControllerAnimatedTransitioning? {
@@ -153,7 +158,7 @@ extension ViewController {
         let alertController = UIAlertController(title: "Error", message: "\(message) Please verify your Internet connection and try again in a moment.", preferredStyle: .alert)
         let okAction = UIAlertAction(title: "OK", style: .default, handler: nil)
         alertController.addAction(okAction)
-        self.present(alertController, animated: true, completion: nil)
+        present(alertController, animated: true, completion: nil)
     }
 }
 
