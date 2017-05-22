@@ -11,5 +11,6 @@ Demonstrated skills:
 7. CoreLocation
 8. Activity Indicator
 9. UITableView, custom UITableViewCell
+10. Gesture Recognizers
 
 
