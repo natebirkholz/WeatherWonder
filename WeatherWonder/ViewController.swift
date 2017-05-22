@@ -12,6 +12,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
 
     // MARK: Properties
 
+    @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
     @IBOutlet weak var tableView: UITableView!
 
     var forecasts: [Forecast]?
@@ -34,9 +35,11 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-
+        activityIndicator.startAnimating()
         networkController.locationController.updadeLocation {
             self.networkController.getJSONForForecasts({ (maybeForecasts, maybeError) in
+                self.activityIndicator.stopAnimating()
+
                 guard maybeError == nil else {
                     self.handleError(error: maybeError!)
                     return
