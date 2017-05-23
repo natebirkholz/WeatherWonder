@@ -24,13 +24,13 @@ class AnimateToDetailVCController: NSObject, UIViewControllerAnimatedTransitioni
             return
         }
         let selectedCell = fromViewController.tableView.cellForRow(at: selectedRow) as! WeatherCell
-        guard let weatherSnapshot = selectedCell.forecastImage.snapshotView(afterScreenUpdates: false) else {
-            assertionFailure("Unable to snapshot the selected cell's forecastImage")
+        guard let weatherSnapshot = selectedCell.snapshotView(afterScreenUpdates: false) else {
+            assertionFailure("Unable to snapshot the selected cell")
             return
         }
 
-        weatherSnapshot.frame = containerView.convert(selectedCell.forecastImage.frame, from: fromViewController.tableView.cellForRow(at: selectedRow))
-        selectedCell.forecastImage.isHidden = true
+        weatherSnapshot.frame = containerView.convert(selectedCell.bounds, from: fromViewController.tableView.cellForRow(at: selectedRow))
+        selectedCell.alpha = 0
         toViewController.view.frame = transitionContext.finalFrame(for: toViewController)
         toViewController.view.alpha = 0
         toViewController.detailImageView.isHidden = true
@@ -46,14 +46,20 @@ class AnimateToDetailVCController: NSObject, UIViewControllerAnimatedTransitioni
             toViewController.view.layoutIfNeeded()
             
             toViewController.view.alpha = 1.0
-            weatherSnapshot.frame = toViewController.detailImageView.frame
+            let newOrigin = CGPoint(x: toViewController.view.frame.origin.x, y: toViewController.view.frame.origin.y + (toViewController.navigationController?.navigationBar.frame.height)!)
+            weatherSnapshot.frame.origin = newOrigin
 
         }, completion: { (finished) -> Void in
-            toViewController.detailImageView.isHidden = false
-            selectedCell.forecastImage.isHidden = false
-            weatherSnapshot.removeFromSuperview()
-            transitionContext.completeTransition(true)
-            fromViewController.tableView.deselectRow(at: selectedRow, animated: true)
+            UIView.animate(withDuration: duration, animations: { 
+                weatherSnapshot.frame.size = toViewController.view.frame.size
+                weatherSnapshot.alpha = 0.0
+            }, completion: { (complete) in
+                toViewController.detailImageView.isHidden = false
+                selectedCell.alpha = 1.0
+                weatherSnapshot.removeFromSuperview()
+                transitionContext.completeTransition(true)
+                fromViewController.tableView.deselectRow(at: selectedRow, animated: true)
+            })
         })
     }
     
