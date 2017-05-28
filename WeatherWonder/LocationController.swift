@@ -14,6 +14,7 @@ class LocationController: NSObject, CLLocationManagerDelegate {
     var currentZipCode: String = "92102"
     /// Instance of a CLLocaationManager
     var locationManager = CLLocationManager()
+    var geocoder = CLGeocoder()
 
     override init() {
         super.init()
@@ -31,7 +32,7 @@ class LocationController: NSObject, CLLocationManagerDelegate {
     }
 
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        CLGeocoder().reverseGeocodeLocation(locations[0], completionHandler: { [weak self] (places, error) -> Void in
+        geocoder.reverseGeocodeLocation(locations[0], completionHandler: { [weak self] (places, error) -> Void in
             if error != nil { return }
 
             if let count = places?.count, count > 0 {
@@ -49,7 +50,7 @@ class LocationController: NSObject, CLLocationManagerDelegate {
     /// - Parameter completionHandler: callback upon completion
     func updadeLocation(completionHandler: @escaping ()->()) {
         if let  thisLocation = locationManager.location {
-            CLGeocoder().reverseGeocodeLocation(thisLocation, completionHandler: { [weak self] (places, error) -> Void in
+            geocoder.reverseGeocodeLocation(thisLocation, completionHandler: { [weak self] (places, error) -> Void in
                 if error != nil {
                     print(error?.localizedDescription as Any)
                     completionHandler()
