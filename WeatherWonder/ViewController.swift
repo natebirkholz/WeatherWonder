@@ -36,23 +36,23 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         activityIndicator.startAnimating()
-        networkController.locationController.updadeLocation { [weak self] in
-            self?.networkController.getJSONForForecasts({ [weak self] (maybeForecasts, maybeError) in
-                self?.activityIndicator.stopAnimating()
+        networkController.locationController.updadeLocation { [unowned self] in
+            self.networkController.getJSONForForecasts({ [unowned self] (maybeForecasts, maybeError) in
+                self.activityIndicator.stopAnimating()
 
                 guard maybeError == nil else {
-                    self?.handleError(error: maybeError!)
+                    self.handleError(error: maybeError!)
                     return
                 }
 
                 guard let isForecasts = maybeForecasts else {
                     assertionFailure("Should never get here, please ensure that forecasts are always returned if error is nil.")
-                    self?.handleError(error: .unknownError)
+                    self.handleError(error: .unknownError)
                     return
                 }
 
-                self?.forecasts = isForecasts
-                self?.tableView.reloadData()
+                self.forecasts = isForecasts
+                self.tableView.reloadData()
             })
         }
     }

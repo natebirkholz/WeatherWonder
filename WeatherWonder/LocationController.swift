@@ -32,12 +32,12 @@ class LocationController: NSObject, CLLocationManagerDelegate {
     }
 
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        geocoder.reverseGeocodeLocation(locations[0], completionHandler: { [weak self] (places, error) -> Void in
+        geocoder.reverseGeocodeLocation(locations[0], completionHandler: { [unowned self] (places, error) -> Void in
             if error != nil { return }
 
             if let count = places?.count, count > 0 {
                 if let place = places?[0], let code = place.postalCode {
-                    self?.currentZipCode = code
+                    self.currentZipCode = code
                 }
             } else {
                 print("Problem with the data received from CLGeocoder")
@@ -50,7 +50,7 @@ class LocationController: NSObject, CLLocationManagerDelegate {
     /// - Parameter completionHandler: callback upon completion
     func updadeLocation(completionHandler: @escaping ()->()) {
         if let  thisLocation = locationManager.location {
-            geocoder.reverseGeocodeLocation(thisLocation, completionHandler: { [weak self] (places, error) -> Void in
+            geocoder.reverseGeocodeLocation(thisLocation, completionHandler: { [unowned self] (places, error) -> Void in
                 if error != nil {
                     print(error?.localizedDescription as Any)
                     completionHandler()
@@ -59,7 +59,7 @@ class LocationController: NSObject, CLLocationManagerDelegate {
 
                 if let count = places?.count, count > 0 {
                     if let place = places?[0], let code = place.postalCode {
-                        self?.currentZipCode = code
+                        self.currentZipCode = code
                         completionHandler()
                     }
                 } else {
