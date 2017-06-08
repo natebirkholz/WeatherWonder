@@ -13,6 +13,11 @@ enum ParseError: Error {
 }
 
 class JsonParser {
+    let dateFormatter = DateFormatter()
+
+    init() {
+        dateFormatter.dateFormat = "EEEE"
+    }
 
     /// Parses JSON into an array of Forecast objects from the API JSON response
     ///
@@ -63,10 +68,8 @@ class JsonParser {
     /// - Parameter dateCode: the date code from the api
     /// - Returns: The day of the week as a string
     func parseDateCodeIntoDay(_ dateCode: Double) -> String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "EEEE"
         let aDate = Date(timeIntervalSince1970: TimeInterval(dateCode))
-        let dateForForecast = formatter.string(from: aDate)
+        let dateForForecast = dateFormatter.string(from: aDate)
         return dateForForecast
     }
 
