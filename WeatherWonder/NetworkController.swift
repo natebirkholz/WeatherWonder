@@ -33,7 +33,7 @@ class NetworkController {
     /// Fetches the JSON from the API using rhe apiURL property
     ///
     /// - Parameter completionHandler: returns an optional array of forecasts of successful, a optional NetworkControllerError error if unsuccessful
-    func getJSONForForecasts(_ completionHandler: @escaping (_ forecasts: [Forecast]?, _ error: NetworkControllerError?) -> ()) {
+    func getForecasts(_ completionHandler: @escaping (_ forecasts: [Forecast]?, _ error: NetworkControllerError?) -> ()) {
         fetchJSONFromURL(apiURL, completionHandler: { (maybeDataFromURL, maybeError) -> () in
             DispatchQueue.main.async {
                 guard let dataResult = maybeDataFromURL else {

@@ -34,17 +34,15 @@ class AnimateToDetailVCController: NSObject, UIViewControllerAnimatedTransitioni
         toViewController.view.frame = transitionContext.finalFrame(for: toViewController)
         toViewController.view.alpha = 0
         toViewController.detailImageView.isHidden = true
+
+        containerView.addSubview(toViewController.view)
+        containerView.addSubview(weatherSnapshot)
+
         // Update layout to clean up begnning positions of labels on detail VC, Size Classes issue
         toViewController.view.setNeedsLayout()
         toViewController.view.layoutIfNeeded()
 
-        containerView.addSubview(toViewController.view)
-        containerView.addSubview(weatherSnapshot)
         UIView.animate(withDuration: duration, animations: { () -> Void in
-            // Update layout to set proper target for final frame of animation, Size Classes issue
-            toViewController.view.setNeedsLayout()
-            toViewController.view.layoutIfNeeded()
-            
             toViewController.view.alpha = 1.0
             weatherSnapshot.frame = toViewController.detailImageView.frame
 

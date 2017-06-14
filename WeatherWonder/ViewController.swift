@@ -37,7 +37,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         super.viewWillAppear(animated)
         activityIndicator.startAnimating()
         networkController.locationController.updadeLocation { [unowned self] in
-            self.networkController.getJSONForForecasts({ [unowned self] (maybeForecasts, maybeError) in
+            self.networkController.getForecasts({ [unowned self] (maybeForecasts, maybeError) in
                 self.activityIndicator.stopAnimating()
 
                 guard maybeError == nil else {
@@ -68,7 +68,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let forecastForRow = forecasts?[(indexPath as NSIndexPath).row]
+        let forecastForRow = forecasts?[indexPath.row]
         let cell = tableView.dequeueReusableCell(withIdentifier: "FORECAST_CELL", for: indexPath) as! WeatherCell
 
         // Keep images consistent in tableView
